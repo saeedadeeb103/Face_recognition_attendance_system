@@ -1,59 +1,63 @@
-import cv2 as cv 
+import cv2 as cv
 import os
 import pickle
 import face_recognition
-import numpy as np 
+import numpy as np
 import cvzone
-imgsz = (640, 480)
-cap = cv.VideoCapture(0, cv.CAP_DSHOW)
-cap.set(3, imgsz[0])
-cap.set(4, imgsz[1])
 
+class FaceRecognitionAttendanceSystem:
+    def __init__(self):
+        self.imgsz = (640, 480)
+        self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+        self.cap.set(3, self.imgsz[0])
+        self.cap.set(4, self.imgsz[1])
 
-# Importingg the Modes Images into a List 
-imgBackground = cv.imread('resources/background.png')
-FolderModePath = 'resources/Modes'
-ModePathList = os.listdir(FolderModePath)
-imgModeList = []
-for path in ModePathList:
-    imgModeList.append(cv.imread(os.path.join(FolderModePath, path)))
+        self.imgBackground = cv.imread('resources/background.png')
+        self.FolderModePath = 'resources/Modes'
+        self.ModePathList = os.listdir(self.FolderModePath)
+        self.imgModeList = [cv.imread(os.path.join(self.FolderModePath, path)) for path in self.ModePathList]
 
-# Load the encoding file 
-print("Loading Encoded File .......")
-file = open('EncodeFile.p', 'rb')
-KnownEncodingwithIDs  = pickle.load(file)
-file.close()
+        self.load_encoded_data()
+    
+    def load_encoded_data(self):
+        print("Loading Encoded File .......")
+        with open('EncodeFile.p', 'rb') as file:
+            KnownEncodingwithIDs = pickle.load(file)
 
-KnownEncodings, employesID = KnownEncodingwithIDs
-# print(employesID)
-print("Encoded File Loaded")
-while True:
-    success, img = cap.read()
+        self.KnownEncodings, self.employesID = KnownEncodingwithIDs
+        print("Encoded File Loaded")
 
-    imgSize = cv.resize(img, (0,0), None, 0.25, 0.25)
-    imgSize = cv.cvtColor(imgSize, cv.COLOR_BGR2RGB)
+    def mark_attendance(self):
+        while True:
+            success, img = self.cap.read()
+            imgSize = cv.resize(img, (0, 0), None, 0.25, 0.25)
+            imgSize = cv.cvtColor(imgSize, cv.COLOR_BGR2RGB)
 
-    faceCurrentFrame = face_recognition.face_locations(imgSize)
-    encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
-    imgBackground[162:162+480, 55:55+640] = img
-    imgBackground[44:44+633, 808:808+414] = imgModeList[1]
+            faceCurrentFrame = face_recognition.face_locations(imgSize)
+            encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
+            self.imgBackground[162:162 + 480, 55:55 + 640] = img
+            self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[1]
 
-    for encodeFace, faceLoc in zip(encodeCurrentFrame, faceCurrentFrame):
-        matches = face_recognition.compare_faces(KnownEncodings, encodeFace)
-        Face_Dis = face_recognition.face_distance(KnownEncodings, encodeFace)
-        matchIndex = np.argmin(Face_Dis)
+            for encodeFace, faceLoc in zip(encodeCurrentFrame, faceCurrentFrame):
+                matches = face_recognition.compare_faces(self.KnownEncodings, encodeFace)
+                Face_Dis = face_recognition.face_distance(self.KnownEncodings, encodeFace)
+                matchIndex = np.argmin(Face_Dis)
 
-        if matches[matchIndex]:
-            # print(employesID[matchIndex])
-            # print("Known Faces Detected.")
-            y1, x2, y2, x1 = faceLoc
-            y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+                if matches[matchIndex]:
+                    y1, x2, y2, x1 = faceLoc
+                    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                    bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
+                    self.imgBackground = cvzone.cornerRect(self.imgBackground, bbox, rt=0)
 
-            bbox = 55+x1, 162+y1, x2-x1, y2-y1 
-            imgBackground = cvzone.cornerRect(imgBackground, bbox, rt= 0 )
-    cv.imshow("Face Attendance", imgBackground)
-    if cv.waitKey(1) & 0xFF == ord('q'):
-        break
+            cv.imshow("Face Attendance", self.imgBackground)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                break
 
-cap.release()
-cv.destroyAllWindows()
+    def run(self):
+        self.mark_attendance()
+        self.cap.release()
+        cv.destroyAllWindows()
+
+if __name__ == "__main__":
+    attendance_system = FaceRecognitionAttendanceSystem()
+    attendance_system.run()

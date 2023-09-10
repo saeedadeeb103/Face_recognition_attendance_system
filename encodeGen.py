@@ -3,35 +3,47 @@ import face_recognition
 import pickle
 import os
 
+class EncodeGenerator:
+    def __init__(self, image_folder):
+        self.image_folder = image_folder
 
-# Importingg the Employees Images 
-FolderPath = 'images'
-PathList = os.listdir(FolderPath)
-imgList = []
-employesID = []
+    def load_images(self):
+        imgList = []
+        employesID = []
 
-for path in PathList:
-    imgList.append(cv.imread(os.path.join(FolderPath, path)))
-    employesID.append(os.path.splitext(path)[0])
+        for filename in os.listdir(self.image_folder):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                img_path = os.path.join(self.image_folder, filename)
+                imgList.append(cv.imread(img_path))
+                employesID.append(os.path.splitext(filename)[0])
 
-print(employesID)
+        return imgList, employesID
 
+    def find_encodings(self, imagesList):
+        encodeList = []
 
-def FindEncodeings(imagesList):
-    encodeList = []
-    for img in imagesList:
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
-        encodeList.append(encode)
+        for img in imagesList:
+            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            encode = face_recognition.face_encodings(img)[0] if face_recognition.face_encodings(img) else None
+            encodeList.append(encode)
 
-    return encodeList
-print("Encoding Started ....")
-KnownEncodings = FindEncodeings(imgList)
-KnownEncodingswithIDs = [KnownEncodings, employesID]
-print("Encoding Compelete")
+        return encodeList
 
-file = open("EncodeFile.p", 'wb')
+    def generate_and_save_encodings(self, output_file):
+        imgList, employesID = self.load_images()
+        print("Encoding Started ....")
+        KnownEncodings = self.find_encodings(imgList)
+        KnownEncodingswithIDs = [KnownEncodings, employesID]
+        print("Encoding Complete")
 
-pickle.dump(KnownEncodingswithIDs, file)
-file.close()
-print("File Saved")
+        with open(output_file, 'wb') as file:
+            pickle.dump(KnownEncodingswithIDs, file)
+
+        print("File Saved")
+
+if __name__ == "__main__":
+    image_folder = 'images'
+    output_file = 'EncodeFile.p'
+
+    encoder = EncodeGenerator(image_folder)
+    encoder.generate_and_save_encodings(output_file)
