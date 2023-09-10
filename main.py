@@ -4,14 +4,19 @@ import pickle
 import face_recognition
 import numpy as np
 import cvzone
+from firebase_admin import db
+from DataManager import DataManager 
 
 class FaceRecognitionAttendanceSystem:
     def __init__(self):
+        self.data_manager = DataManager()
         self.imgsz = (640, 480)
         self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
         self.cap.set(3, self.imgsz[0])
         self.cap.set(4, self.imgsz[1])
-
+        self.counter = 0 
+        self.modeType = 0
+        self.ID = -1
         self.imgBackground = cv.imread('resources/background.png')
         self.FolderModePath = 'resources/Modes'
         self.ModePathList = os.listdir(self.FolderModePath)
@@ -36,7 +41,7 @@ class FaceRecognitionAttendanceSystem:
             faceCurrentFrame = face_recognition.face_locations(imgSize)
             encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
             self.imgBackground[162:162 + 480, 55:55 + 640] = img
-            self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[1]
+            self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[0]
 
             for encodeFace, faceLoc in zip(encodeCurrentFrame, faceCurrentFrame):
                 matches = face_recognition.compare_faces(self.KnownEncodings, encodeFace)
@@ -48,6 +53,16 @@ class FaceRecognitionAttendanceSystem:
                     y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                     bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
                     self.imgBackground = cvzone.cornerRect(self.imgBackground, bbox, rt=0)
+                    self.ID = self.employesID[matchIndex]
+                    if self.counter ==0: 
+                        self.counter = 1
+
+            if self.counter != 0: 
+
+                if self.counter ==1: 
+                    employee_info = self.data_manager.get_employee_info_by_id(self.ID)
+                    print(employee_info)
+                self.counter+= 1
 
             cv.imshow("Face Attendance", self.imgBackground)
             if cv.waitKey(1) & 0xFF == ord('q'):

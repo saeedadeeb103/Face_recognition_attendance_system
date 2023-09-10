@@ -42,6 +42,10 @@ class DataManager:
             employee_data = json.load(file)
         return employee_data
 
+    def get_employee_info_by_id(self, employee_id):
+        employee_info = self.ref.child(employee_id).get()
+        return employee_info
+
 if __name__ == "__main__":
     data_manager = DataManager()
 
