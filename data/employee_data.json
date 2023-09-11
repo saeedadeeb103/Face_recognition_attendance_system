@@ -1,27 +1,49 @@
 {
-    "395": {
-      "Name": "Mariam",
-      "Position": "R&D Engineer",
-      "Starting_Year": 2023,
-      "Login_Time": "2023-09-11 08:30:00",
-      "Logout_Time": "2023-09-11 16:30:00",
-      "Delayes": 0
-    },
-    "387": {
-      "Name": "Saeed",
-      "Position": "Robotics Engineer",
-      "Starting_Year": 2023,
-      "Login_Time": "2023-09-11 08:30:00",
-      "Logout_Time": "2023-09-11 16:30:00",
-      "Delayes": 0
-    },
-    "385": {
-      "Name": "Mohannad",
-      "Position": "AI Engineer",
-      "Starting_Year": 2023,
-      "Login_Time": "2023-09-11 08:30:00",
-      "Logout_Time": "2023-09-11 16:30:00",
-      "Delayes": 0
-    }
-  }
-  
+  "employees": [
+      {
+          "id": "395",
+          "name": "Mariam",
+          "position": "R&D Engineer",
+          "starting_year": 2023,
+          "attendance": [
+              {
+                  "date": "2023-09-11",
+                  "login_time": "08:30:00",
+                  "logout_time": "16:30:00",
+                  "delays": 0
+              }
+              
+          ]
+      },
+      {
+          "id": "387",
+          "name": "Saeed",
+          "position": "Robotics Engineer",
+          "starting_year": 2023,
+          "attendance": [
+              {
+                  "date": "2023-09-11",
+                  "login_time": "08:30:00",
+                  "logout_time": "16:30:00",
+                  "delays": 0
+              }
+              
+          ]
+      },
+      {
+          "id": "385",
+          "name": "Mohannad",
+          "position": "AI Engineer",
+          "starting_year": 2023,
+          "attendance": [
+              {
+                  "date": "2023-09-11",
+                  "login_time": "08:30:00",
+                  "logout_time": "16:30:00",
+                  "delays": 0
+              }
+              
+          ]
+      }
+  ]
+}

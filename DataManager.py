@@ -15,7 +15,7 @@ class DataManager:
             "databaseURL": "https://employer-tracker-6c2be-default-rtdb.firebaseio.com/",
             "storageBucket": "employer-tracker-6c2be.appspot.com",
         })
-        self.ref = db.reference("employers")
+        self.ref = db.reference("Data")
         self.storage_bucket = storage.bucket()
 
     def upload_employee_data(self, data):
@@ -47,8 +47,16 @@ class DataManager:
         return employee_data
 
     def get_employee_info_by_id(self, employee_id):
-        employee_info = self.ref.child(employee_id).get()
-        return employee_info
+        # Navigate to the "employees" node and search for the employee by ID
+        employees_ref = self.ref.get()
+        for employee in employees_ref.get("employees", []):
+            if employee.get("id") == employee_id:
+                return employee
+        print(employee)
+        # If no match is found, return None
+        return None
+
+
     
     def get_employee_image_by_id(self, employee_id):
         # Construct the storage path for the employee's image
@@ -62,13 +70,17 @@ class DataManager:
 
     def update_employee_login_time(self, employee_id, login_time):
         # Get the current employee data
-        employee_data = self.ref.child(employee_id).get()
+        employee_data = self.get_employee_info_by_id(employee_id)
         
-        # Check if there is a "Login_Time" and if it's a different date
-        if "Login_Time" not in employee_data or not self.is_same_date(employee_data["Login_Time"], login_time):
-            # Update the login time for the specified employee
-            employee_data["Login_Time"] = login_time
-            self.ref.child(employee_id).update({"Login_Time": login_time})
+        # Check if there is "attendance" data for the employee
+        if "attendance" in employee_data:
+            # Iterate through attendance records to find the right date
+            for record in employee_data["attendance"]:
+                if self.is_same_date(record["date"], login_time):
+                    # Update the login time for the specified date
+                    record["login_time"] = login_time
+                    self.ref.child("employees").child(employee_id).update(employee_data)
+                    break
 
     def is_same_date(self, date1, date2):
         # Check if two datetime strings represent the same date
@@ -76,8 +88,18 @@ class DataManager:
         return datetime.strptime(date1[:10], date_format) == datetime.strptime(date2[:10], date_format)
 
     def update_employee_logout_time(self, employee_id, logout_time):
-        # Update the logout time for the specified employee
-        self.ref.child(employee_id).update({"Logout_Time": logout_time})
+        # Get the current employee data
+        employee_data = self.ref.child("employees").child(employee_id).get()
+        
+        # Check if there is "attendance" data for the employee
+        if "attendance" in employee_data:
+            # Iterate through attendance records to find the right date
+            for record in employee_data["attendance"]:
+                if self.is_same_date(record["date"], logout_time):
+                    # Update the logout time for the specified date
+                    record["logout_time"] = logout_time
+                    self.ref.child("employees").child(employee_id).update(employee_data)
+                    break
 
 if __name__ == "__main__":
     data_manager = DataManager()
@@ -99,3 +121,5 @@ if __name__ == "__main__":
 
     # Upload images to Firebase Storage
     data_manager.upload_images_to_storage(image_paths)
+
+    # Example: Get employee info by ID (e.g., "395")
