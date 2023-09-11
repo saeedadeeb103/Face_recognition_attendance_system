@@ -1,11 +1,11 @@
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import db 
+from firebase_admin import db
 from firebase_admin import storage
-import os 
+import os
 import json
 import numpy as np
-import cv2 as cv 
+import cv2 as cv
 from datetime import datetime
 
 class DataManager:
@@ -19,27 +19,51 @@ class DataManager:
         self.storage_bucket = storage.bucket()
 
     def upload_employee_data(self, data):
-        for key, value in data.items():
-            self.ref.child(key).set(value)
-        print("Employee data uploaded to the Realtime Database.")
+        employees_ref = self.ref
+
+        # Get the current employee IDs from the Realtime Database
+        current_ids = set(employees_ref.child("employees").get().keys()) if employees_ref.get() else set()
+        import pdb
+        
+        for key, value in data['employees'].items():
+            # Check if the employee ID already exists in the database
+            
+            if key not in current_ids:
+                
+                # Add the employee data since it doesn't exist
+                employees_ref.child("employees").child(key).set(value)
+                print(f"Employee data for ID {key} added to the Realtime Database.")
+            else:
+                print(f"Employee with ID {key} already exists in the database. Skipping.")
+
 
     def upload_images_to_storage(self, image_paths):
         storage_ref = storage.bucket()
+        
+        # Get the list of image filenames already in Firebase Storage
+        current_image_filenames = [blob.name.split("/")[-1] for blob in storage_ref.list_blobs()]
 
         for path in image_paths:
-            # Construct a unique storage path for each image (e.g., "images/395.jpg")
+            # Extract the filename from the local path
             image_filename = os.path.basename(path)
-            storage_path = f"images/{image_filename}"
 
-            # Upload the image to Firebase Storage
-            blob = storage_ref.blob(storage_path)
-            blob.upload_from_filename(path)
+            # Check if the image filename already exists in Firebase Storage
+            if image_filename not in current_image_filenames:
+                # Construct a unique storage path for the image
+                storage_path = f"images/{image_filename}"
 
-            # Get the public URL of the uploaded image
-            image_url = blob.public_url
-            print(f"Uploaded image: {image_url}")
-        
+                # Upload the image to Firebase Storage
+                blob = storage_ref.blob(storage_path)
+                blob.upload_from_filename(path)
+
+                # Get the public URL of the uploaded image
+                image_url = blob.public_url
+                print(f"Uploaded image: {image_url}")
+            else:
+                print(f"Image {image_filename} already exists in Firebase Storage. Skipping.")
+
         print("Images uploaded to Firebase Storage.")
+
 
     def load_employee_data_from_json(self, json_file):
         with open(json_file, 'r') as file:
@@ -48,16 +72,10 @@ class DataManager:
 
     def get_employee_info_by_id(self, employee_id):
         # Navigate to the "employees" node and search for the employee by ID
-        employees_ref = self.ref.get()
-        for employee in employees_ref.get("employees", []):
-            if employee.get("id") == employee_id:
-                return employee
-        print(employee)
-        # If no match is found, return None
-        return None
+        employees_ref = self.ref.child("employees")
+        employee_data = employees_ref.child(employee_id).get()
+        return employee_data
 
-
-    
     def get_employee_image_by_id(self, employee_id):
         # Construct the storage path for the employee's image
         storage_path = f"images/{employee_id}.jpg"
@@ -68,38 +86,30 @@ class DataManager:
         employee_img = cv.imdecode(array, cv.COLOR_BGRA2BGR)
         return employee_img
 
-    def update_employee_login_time(self, employee_id, login_time):
-        # Get the current employee data
-        employee_data = self.get_employee_info_by_id(employee_id)
-        
-        # Check if there is "attendance" data for the employee
-        if "attendance" in employee_data:
-            # Iterate through attendance records to find the right date
-            for record in employee_data["attendance"]:
-                if self.is_same_date(record["date"], login_time):
-                    # Update the login time for the specified date
-                    record["login_time"] = login_time
-                    self.ref.child("employees").child(employee_id).update(employee_data)
-                    break
+    def update_employee_login_logout_time(self, employee_id, login_logout_time):
+        # Navigate to the "employees" node and search for the employee by ID
+        employees_ref = self.ref.child("employees")
+        employee_data = employees_ref.child(employee_id).get()
+
+        if employee_data:
+            # Check if there is "attendance" data for the employee
+            attendance = employee_data.get("attendance", {})
+            new_date = login_logout_time.strftime("%Y-%m-%d")  # Convert datetime to string with format
+
+            # Check if there's already an entry for the same day
+            if new_date not in attendance:
+                attendance[new_date] = {"login_time": login_logout_time.strftime("%H:%M:%S"), "logout_time": None, "delays": 0}
+            else:
+                # If there's already an entry, it means the employee logged out later on the same day
+                attendance[new_date]["logout_time"] = login_logout_time.strftime("%H:%M:%S")
+                
+            employees_ref.child(employee_id).child("attendance").set(attendance)
 
     def is_same_date(self, date1, date2):
         # Check if two datetime strings represent the same date
         date_format = "%Y-%m-%d"
-        return datetime.strptime(date1[:10], date_format) == datetime.strptime(date2[:10], date_format)
-
-    def update_employee_logout_time(self, employee_id, logout_time):
-        # Get the current employee data
-        employee_data = self.ref.child("employees").child(employee_id).get()
-        
-        # Check if there is "attendance" data for the employee
-        if "attendance" in employee_data:
-            # Iterate through attendance records to find the right date
-            for record in employee_data["attendance"]:
-                if self.is_same_date(record["date"], logout_time):
-                    # Update the logout time for the specified date
-                    record["logout_time"] = logout_time
-                    self.ref.child("employees").child(employee_id).update(employee_data)
-                    break
+        date2_str = date2.strftime(date_format)  # Format date2 as a string in the same format
+        return date1[:10] == date2_str
 
 if __name__ == "__main__":
     data_manager = DataManager()
@@ -112,7 +122,7 @@ if __name__ == "__main__":
 
     # Add 'images/' prefix to PathList
     image_folder = 'images/'
-    
+
     image_paths = []
     for filename in os.listdir(image_folder):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):

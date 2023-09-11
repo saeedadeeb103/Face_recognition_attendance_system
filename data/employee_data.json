@@ -1,49 +1,53 @@
 {
-  "employees": [
-      {
-          "id": "395",
-          "name": "Mariam",
-          "position": "R&D Engineer",
-          "starting_year": 2023,
-          "attendance": [
-              {
-                  "date": "2023-09-11",
-                  "login_time": "08:30:00",
-                  "logout_time": "16:30:00",
-                  "delays": 0
-              }
-              
-          ]
+    "employees": {
+      "395": {
+        "name": "Mariam",
+        "position": "R&D Engineer",
+        "starting_year": 2023,
+        "attendance": {
+          "2023-09-11": {
+            "login_time": "08:30:00",
+            "logout_time": "16:30:00",
+            "delays": 0
+          }
+        }
       },
-      {
-          "id": "387",
-          "name": "Saeed",
-          "position": "Robotics Engineer",
-          "starting_year": 2023,
-          "attendance": [
-              {
-                  "date": "2023-09-11",
-                  "login_time": "08:30:00",
-                  "logout_time": "16:30:00",
-                  "delays": 0
-              }
-              
-          ]
+      "387": {
+        "name": "Saeed",
+        "position": "Robotics Engineer",
+        "starting_year": 2023,
+        "attendance": {
+          "2023-09-11": {
+            "login_time": "08:30:00",
+            "logout_time": "16:30:00",
+            "delays": 0
+          }
+        }
       },
-      {
-          "id": "385",
-          "name": "Mohannad",
-          "position": "AI Engineer",
-          "starting_year": 2023,
-          "attendance": [
-              {
-                  "date": "2023-09-11",
-                  "login_time": "08:30:00",
-                  "logout_time": "16:30:00",
-                  "delays": 0
-              }
-              
-          ]
+      "385": {
+        "name": "Mohannad",
+        "position": "AI Engineer",
+        "starting_year": 2023,
+        "attendance": {
+          "2023-09-11": {
+            "login_time": "08:30:00",
+            "logout_time": "16:30:00",
+            "delays": 0
+          }
+        }
+      }, 
+      "100": {
+        "name": "Adeeb",
+        "position": "Production Manager",
+        "starting_year": 2019,
+        "attendance": {
+          "2023-09-11": {
+            "login_time": "",
+            "logout_time": "",
+            "delays": 0
+          }
+        }
       }
-  ]
-}
+    }
+  }
+  
