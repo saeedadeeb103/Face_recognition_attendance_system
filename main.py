@@ -6,6 +6,7 @@ import numpy as np
 import cvzone
 from firebase_admin import db
 from DataManager import DataManager 
+from datetime import datetime  # Import datetime module
 
 class FaceRecognitionAttendanceSystem:
     def __init__(self):
@@ -41,7 +42,7 @@ class FaceRecognitionAttendanceSystem:
             faceCurrentFrame = face_recognition.face_locations(imgSize)
             encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
             self.imgBackground[162:162 + 480, 55:55 + 640] = img
-            self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[0]
+            self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
 
             for encodeFace, faceLoc in zip(encodeCurrentFrame, faceCurrentFrame):
                 matches = face_recognition.compare_faces(self.KnownEncodings, encodeFace)
@@ -54,19 +55,66 @@ class FaceRecognitionAttendanceSystem:
                     bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
                     self.imgBackground = cvzone.cornerRect(self.imgBackground, bbox, rt=0)
                     self.ID = self.employesID[matchIndex]
-                    if self.counter ==0: 
+                    if self.counter == 0: 
                         self.counter = 1
+                        self.modeType = 1
+                        self.record_login_time()  # Record login time on first scan
+                    else:
+                        self.record_logout_time()  # Record logout time on subsequent scans
 
             if self.counter != 0: 
 
                 if self.counter ==1: 
+                    # Get Data 
                     employee_info = self.data_manager.get_employee_info_by_id(self.ID)
                     print(employee_info)
+
+                    # Get The Image from the Storage 
+                    employee_img = self.data_manager.get_employee_image_by_id(self.ID)
+
+                if 10 < self.counter < 20: 
+                    self.modeType = 2
+                    
+                self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
+                if self.counter <= 10:
+                    cv.putText(self.imgBackground, str(employee_info['Login_Time']), (861, 125), 
+                            cv.FONT_HERSHEY_COMPLEX, 0.4, (0, 0, 0), 1)
+                    cv.putText(self.imgBackground, str(employee_info['Position']), (1006, 550), 
+                            cv.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0), 1)
+                    cv.putText(self.imgBackground, str(self.ID), (1006, 493), 
+                            cv.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
+                    cv.putText(self.imgBackground, str(employee_info['Delayes']), (910, 625), 
+                            cv.FONT_HERSHEY_COMPLEX, 0.5, (100, 100, 100), 1)
+                    cv.putText(self.imgBackground, str(employee_info['Starting_Year']), (1125, 625), 
+                            cv.FONT_HERSHEY_COMPLEX, 0.5, (100, 100, 100), 1)
+                    
+                    (w,h ), _ = cv.getTextSize(employee_info['Name'], cv.FONT_HERSHEY_COMPLEX,1 , 1)
+                    offset = (414-w)//2
+                    cv.putText(self.imgBackground, str(employee_info['Name']), (808+offset, 455), 
+                            cv.FONT_HERSHEY_COMPLEX, 1, (50, 50, 50), 1)
+
+                    self.imgBackground[175:175+216, 909:909+216] = employee_img
                 self.counter+= 1
+
+                if self.counter >= 20: 
+                    self.counter = 0 
+                    self.modeType = 0 
+                    employee_info = []
+                    employee_img = []
+                    self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
 
             cv.imshow("Face Attendance", self.imgBackground)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
+    def record_login_time(self):
+        # Record login time for the employee in Firebase
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.data_manager.update_employee_login_time(self.ID, current_time)
+
+    def record_logout_time(self):
+        # Record logout time for the employee in Firebase
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.data_manager.update_employee_logout_time(self.ID, current_time)
 
     def run(self):
         self.mark_attendance()

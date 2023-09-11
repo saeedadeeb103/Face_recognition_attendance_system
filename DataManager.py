@@ -4,6 +4,9 @@ from firebase_admin import db
 from firebase_admin import storage
 import os 
 import json
+import numpy as np
+import cv2 as cv 
+from datetime import datetime
 
 class DataManager:
     def __init__(self):
@@ -13,6 +16,7 @@ class DataManager:
             "storageBucket": "employer-tracker-6c2be.appspot.com",
         })
         self.ref = db.reference("employers")
+        self.storage_bucket = storage.bucket()
 
     def upload_employee_data(self, data):
         for key, value in data.items():
@@ -45,6 +49,35 @@ class DataManager:
     def get_employee_info_by_id(self, employee_id):
         employee_info = self.ref.child(employee_id).get()
         return employee_info
+    
+    def get_employee_image_by_id(self, employee_id):
+        # Construct the storage path for the employee's image
+        storage_path = f"images/{employee_id}.jpg"
+
+        # Get the download URL of the image
+        blob = self.storage_bucket.get_blob(storage_path)
+        array = np.frombuffer(blob.download_as_string(), np.uint8)
+        employee_img = cv.imdecode(array, cv.COLOR_BGRA2BGR)
+        return employee_img
+
+    def update_employee_login_time(self, employee_id, login_time):
+        # Get the current employee data
+        employee_data = self.ref.child(employee_id).get()
+        
+        # Check if there is a "Login_Time" and if it's a different date
+        if "Login_Time" not in employee_data or not self.is_same_date(employee_data["Login_Time"], login_time):
+            # Update the login time for the specified employee
+            employee_data["Login_Time"] = login_time
+            self.ref.child(employee_id).update({"Login_Time": login_time})
+
+    def is_same_date(self, date1, date2):
+        # Check if two datetime strings represent the same date
+        date_format = "%Y-%m-%d"
+        return datetime.strptime(date1[:10], date_format) == datetime.strptime(date2[:10], date_format)
+
+    def update_employee_logout_time(self, employee_id, logout_time):
+        # Update the logout time for the specified employee
+        self.ref.child(employee_id).update({"Logout_Time": logout_time})
 
 if __name__ == "__main__":
     data_manager = DataManager()
