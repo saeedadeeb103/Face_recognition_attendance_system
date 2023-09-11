@@ -90,9 +90,9 @@ class FaceRecognitionAttendanceSystem:
                     cv.putText(self.imgBackground, str(employee_info['starting_year']), (1125, 625), 
                             cv.FONT_HERSHEY_COMPLEX, 0.5, (100, 100, 100), 1)
                     
-                    (w,h ), _ = cv.getTextSize(employee_info['Name'], cv.FONT_HERSHEY_COMPLEX,1 , 1)
+                    (w,h ), _ = cv.getTextSize(employee_info['name'], cv.FONT_HERSHEY_COMPLEX,1 , 1)
                     offset = (414-w)//2
-                    cv.putText(self.imgBackground, str(employee_info['Name']), (808+offset, 455), 
+                    cv.putText(self.imgBackground, str(employee_info['name']), (808+offset, 455), 
                             cv.FONT_HERSHEY_COMPLEX, 1, (50, 50, 50), 1)
 
                     self.imgBackground[175:175+216, 909:909+216] = employee_img
