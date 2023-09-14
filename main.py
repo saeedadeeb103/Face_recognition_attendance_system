@@ -33,6 +33,7 @@ class FaceRecognitionAttendanceSystem:
         self.KnownEncodings, self.employesID = KnownEncodingwithIDs
         print("Encoded File Loaded")
 
+    
     def mark_attendance(self):
         while True:
             success, img = self.cap.read()
@@ -40,7 +41,9 @@ class FaceRecognitionAttendanceSystem:
             imgSize = cv.cvtColor(imgSize, cv.COLOR_BGR2RGB)
 
             faceCurrentFrame = face_recognition.face_locations(imgSize)
+            print("Face_ Location ", faceCurrentFrame)
             encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
+            print("Face Encode Current Frame", encodeCurrentFrame)
             self.imgBackground[162:162 + 480, 55:55 + 640] = img
             self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
 
