@@ -10,7 +10,7 @@ from datetime import datetime
 
 class DataManager:
     def __init__(self):
-        self.cred = credentials.Certificate("service_account_key.json")
+        self.cred = credentials.Certificate("serviceAccountKey.json")
         firebase_admin.initialize_app(self.cred, {
             "databaseURL": "https://employer-tracker-6c2be-default-rtdb.firebaseio.com/",
             "storageBucket": "employer-tracker-6c2be.appspot.com",
@@ -46,6 +46,12 @@ class DataManager:
         for path in image_paths:
             # Extract the filename from the local path
             image_filename = os.path.basename(path)
+            image = cv.imread(path)
+
+            # Check if the image size is not 216x216 pixels
+            if image.shape[0] != 216 or image.shape[1] != 216:
+                # Resize the image to 216x216 pixels
+                image = cv2.resize(image, (216, 216))
 
             # Check if the image filename already exists in Firebase Storage
             if image_filename not in current_image_filenames:
@@ -54,7 +60,7 @@ class DataManager:
 
                 # Upload the image to Firebase Storage
                 blob = storage_ref.blob(storage_path)
-                blob.upload_from_filename(path)
+                blob.upload_from_string(cv.imencode('.jpg', image)[1].tostring(), content_type='image/jpeg')
 
                 # Get the public URL of the uploaded image
                 image_url = blob.public_url

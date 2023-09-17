@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 1800px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.camera-feed {
+    margin-top: 100px;
+    margin-left: 200px;
+    margin-right: 50px;
+    margin-bottom: 200px;
+    width: 640px;
+    height: 480px;
+    padding: 2px;
+    border: 20px solid #007BFF;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+}
+
+.employee-data {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin-right: 150px;
+    width: 450px;
+    height: 600px;
+    padding: 20px;
+    border: 50px solid #8A2BE2;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+/* Style the video element */
+video {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.employee-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px;
+}
+
+.employee-info {
+    font-size: 16px;
+    font-weight: bold;
+}

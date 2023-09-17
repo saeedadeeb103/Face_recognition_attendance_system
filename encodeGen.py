@@ -10,7 +10,6 @@ class EncodeGenerator:
     def load_images(self):
         imgList = []
         employesID = []
-
         for filename in os.listdir(self.image_folder):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 img_path = os.path.join(self.image_folder, filename)
