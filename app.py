@@ -5,7 +5,9 @@ from main import FaceRecognitionAttendanceSystem
 from DataManager import DataManager
 from datetime import datetime
 import cvzone
+
 app = Flask(__name__, template_folder='./templates')
+
 imgsz = (640, 480)
 camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 attendance_system = FaceRecognitionAttendanceSystem()
@@ -28,7 +30,7 @@ def gen_frames():
                 matches = face_recognition.compare_faces(attendance_system.KnownEncodings, face_encoding)
                 if any(matches):
                     employee_id = attendance_system.employesID[matches.index(True)]
-                    print(employee_id)
+
                     employee_info = attendance_system.data_manager.get_employee_info_by_id(employee_id=employee_id)
                     print(employee_info)
                     employee_ids.append(employee_id)
@@ -51,9 +53,11 @@ def gen_frames():
         else:
             pass
 
+
 @app.route('/')
 def index():
-    return render_template('index.html', employee_info=employee_info, date=date)
+    return render_template('index.html', date=date, employee_info=employee_info)
+
 
 @app.route('/video_feed')
 def video_feed():

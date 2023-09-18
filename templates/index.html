@@ -7,28 +7,29 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <h1>Employee Attendance System</h1>
-    </div>
-
+    </header>
     <div class="container">
         <div class="camera-feed">
             <!-- Add an img tag to display the video feed -->
-            <img src="{{ url_for('video_feed') }}" height="100%" id="video-feed">
+            <img src="{{ url_for('video_feed') }}" alt="Video Feed" id="video-feed">
         </div>
-        <div class="employee-data">
+        <div class="employee-data" id="employee-info-container">
             <div class="employee-image">
-                <img src="../images/395.jpg" alt="Employee Image" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="../images/395.jpg" alt="Employee Image" id="employee-img">
             </div>
             <div class="employee-info">
                 <h2>{{ employee_info['name'] }}</h2>
                 <p>Employee ID: {{ employee_info['id'] }}</p>
                 <p>Position: {{ employee_info['position'] }}</p>
-                {% if 'attendance' in employee_info and date in employee_info['attendance'] %}
-                    <p>Time In: {{ employee_info['attendance'][date]['login_time'] }}</p>
-                {% else %}
-                    <p>Time In: N/A</p>
-                {% endif %}
+                <p class="attendance-time">
+                    {% if 'attendance' in employee_info and date in employee_info['attendance'] %}
+                        Time In: {{ employee_info['attendance'][date]['login_time'] }}
+                    {% else %}
+                        Time In: N/A
+                    {% endif %}
+                </p>
             </div>
         </div>
     </div>

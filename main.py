@@ -41,9 +41,7 @@ class FaceRecognitionAttendanceSystem:
             imgSize = cv.cvtColor(imgSize, cv.COLOR_BGR2RGB)
 
             faceCurrentFrame = face_recognition.face_locations(imgSize)
-            # print("Face_ Location ", faceCurrentFrame)
             encodeCurrentFrame = face_recognition.face_encodings(imgSize, faceCurrentFrame)
-            # print("Face Encode Current Frame", encodeCurrentFrame)
             self.imgBackground[162:162 + 480, 55:55 + 640] = img
             self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
 
@@ -115,7 +113,15 @@ class FaceRecognitionAttendanceSystem:
     def record_login_time(self):
         # Record login time for the employee in Firebase
         current_time = datetime.now()
+        expected = datetime(current_time.year , current_time.month, current_time.day, 8, 0 , 0)
+        # Calculate the Delay of the Employee
+        if current_time > expected: 
+            delay = current_time - expected
+            delay_sec = delay.total_seconds()
+        else: 
+            delay_sec = 0 
         self.data_manager.update_employee_login_logout_time(self.ID, current_time)
+
 
     def record_logout_time(self):
         # Record logout time for the employee in Firebase

@@ -7,6 +7,9 @@ import json
 import numpy as np
 import cv2 as cv
 from datetime import datetime
+from encodeGen import EncodeGenerator
+image_folder = 'images'
+output_file = 'EncodeFile.p'
 
 class DataManager:
     def __init__(self):
@@ -51,7 +54,7 @@ class DataManager:
             # Check if the image size is not 216x216 pixels
             if image.shape[0] != 216 or image.shape[1] != 216:
                 # Resize the image to 216x216 pixels
-                image = cv2.resize(image, (216, 216))
+                image = cv.resize(image, (216, 216))
 
             # Check if the image filename already exists in Firebase Storage
             if image_filename not in current_image_filenames:
@@ -65,11 +68,12 @@ class DataManager:
                 # Get the public URL of the uploaded image
                 image_url = blob.public_url
                 print(f"Uploaded image: {image_url}")
+                encoder = EncodeGenerator(image_folder=image_folder)
+                encoder.generate_and_save_encodings(output_file=output_file)
             else:
                 print(f"Image {image_filename} already exists in Firebase Storage. Skipping.")
 
         print("Images uploaded to Firebase Storage.")
-
 
     def load_employee_data_from_json(self, json_file):
         with open(json_file, 'r') as file:
@@ -105,10 +109,21 @@ class DataManager:
             # Check if there's already an entry for the same day
             if new_date not in attendance:
                 attendance[new_date] = {"login_time": login_logout_time.strftime("%H:%M:%S"), "logout_time": None, "delays": 0}
+                expected = datetime(login_logout_time.year , login_logout_time.month, login_logout_time.day, 8, 0 , 0)
+                if login_logout_time > expected: 
+                    delay = login_logout_time - expected
+                    delay_seconds = delay.total_seconds()
+                if delay_seconds > 0: 
+                    attendance[new_date]["delays"] = int(delay_seconds)
+                else: 
+                    attendance[new_date]["delays"] = 0
+
             else:
                 # If there's already an entry, it means the employee logged out later on the same day
                 attendance[new_date]["logout_time"] = login_logout_time.strftime("%H:%M:%S")
-                
+            
+            
+
             employees_ref.child(employee_id).child("attendance").set(attendance)
 
     def is_same_date(self, date1, date2):

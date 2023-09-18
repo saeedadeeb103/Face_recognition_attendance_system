@@ -4,6 +4,7 @@
         "name": "Mariam",
         "position": "R&D Engineer",
         "starting_year": 2023,
+        "email": "", 
         "attendance": {
           "2023-09-11": {
             "login_time": "08:30:00",
@@ -16,6 +17,7 @@
         "name": "Saeed",
         "position": "Robotics Engineer",
         "starting_year": 2023,
+        "email": "", 
         "attendance": {
           "2023-09-11": {
             "login_time": "08:30:00",
@@ -28,6 +30,7 @@
         "name": "Mohannad",
         "position": "AI Engineer",
         "starting_year": 2023,
+        "email": "", 
         "attendance": {
           "2023-09-11": {
             "login_time": "08:30:00",
@@ -40,6 +43,7 @@
         "name": "Adeeb",
         "position": "Production Manager",
         "starting_year": 2019,
+        "email": "", 
         "attendance": {
           "2023-09-11": {
             "login_time": "",
