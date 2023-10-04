@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='detect.css') }}">
+    <title>Attendance system</title>
+</head>
+
+<body>
+    <header class="header">
+        <h1>Employee Attendance System</h1>
+    </header>
+    <div class="container" id="container">
+    
+        <div class="form-container sign-in">
+            <div class="camera-feed">
+                <!-- Add an img tag to display the video feed -->
+                <img src="{{ url_for('video_feed') }}" alt="Video Feed" id="video-feed">
+            </div>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="rectangle">
+                    <span>{{ employee_info['name'] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const loginBtn = document.getElementById('login');
+
+        loginBtn.addEventListener('click', () => {
+            container.classList.remove("active");
+        });
+    </script>
+</body>
+
+</html>

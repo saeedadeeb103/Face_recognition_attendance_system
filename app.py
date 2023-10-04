@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, redirect, url_for
 import cv2
 import face_recognition
 from main import FaceRecognitionAttendanceSystem
@@ -9,13 +9,14 @@ import cvzone
 app = Flask(__name__, template_folder='./templates')
 
 imgsz = (640, 480)
-camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 attendance_system = FaceRecognitionAttendanceSystem()
 date = datetime.now().strftime("%Y-%m-%d")
 employee_info = {}
 
 def gen_frames():
     global date, employee_info
+    recognized_face_detected = False
     while True:
         success, frame = camera.read()
         if success:
@@ -32,8 +33,9 @@ def gen_frames():
                     employee_id = attendance_system.employesID[matches.index(True)]
 
                     employee_info = attendance_system.data_manager.get_employee_info_by_id(employee_id=employee_id)
-                    print(employee_info)
+                    #print(employee_info)
                     employee_ids.append(employee_id)
+                    recognized_face_detected = True
                     break
                 else: 
                     employee_ids.append(None)   
@@ -48,6 +50,9 @@ def gen_frames():
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                if recognized_face_detected:
+                    # Redirect to the 'detect' route with employee_info
+                    return redirect(url_for('detect'))
             except:
                 pass
         else:
@@ -58,6 +63,10 @@ def gen_frames():
 def index():
     return render_template('index.html', date=date, employee_info=employee_info)
 
+@app.route('/detect')
+def detect():
+    print(employee_info)
+    return render_template('detect.html', employee_info=employee_info)
 
 @app.route('/video_feed')
 def video_feed():
