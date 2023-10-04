@@ -109,7 +109,7 @@ class DataManager:
             # Check if there's already an entry for the same day
             if new_date not in attendance:
                 attendance[new_date] = {"login_time": login_logout_time.strftime("%H:%M:%S"), "logout_time": None, "delays": 0}
-                expected = datetime(login_logout_time.year , login_logout_time.month, login_logout_time.day, 8, 0 , 0)
+                expected = datetime(login_logout_time.year , login_logout_time.month, login_logout_time.day, 9, 0 , 0)
                 if login_logout_time > expected: 
                     delay = login_logout_time - expected
                     delay_seconds = delay.total_seconds()
@@ -122,8 +122,6 @@ class DataManager:
                 # If there's already an entry, it means the employee logged out later on the same day
                 attendance[new_date]["logout_time"] = login_logout_time.strftime("%H:%M:%S")
             
-            
-
             employees_ref.child(employee_id).child("attendance").set(attendance)
 
     def is_same_date(self, date1, date2):

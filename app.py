@@ -9,7 +9,7 @@ import cvzone
 app = Flask(__name__, template_folder='./templates')
 
 imgsz = (640, 480)
-camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 attendance_system = FaceRecognitionAttendanceSystem()
 date = datetime.now().strftime("%Y-%m-%d")
 employee_info = {}
@@ -58,6 +58,9 @@ def gen_frames():
         else:
             pass
 
+@app.route('/employee_info')
+def employee_info():
+    return render_template("employee_info.html", employee_info=employee_info)
 
 @app.route('/')
 def index():

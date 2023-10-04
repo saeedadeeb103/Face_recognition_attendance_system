@@ -7,6 +7,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='detect.css') }}">
     <title>Attendance system</title>
+    <script type="text/javascript">
+        window.onload = function() {
+            const container = document.getElementById('container');
+            const formContainer = document.querySelector('.form-container');
+            const employeeInfo = document.getElementById('employee_name'); // Reference to the div where you want to display employee info
+
+            function refreshEmployeeInfo() {
+                fetch("/detect", {
+                    method: "GET"
+                })
+                .then(response => {
+                    // Handle response or error if needed
+                })
+                .then(() => {
+                    fetch("/employee_info", {
+                        method: "GET"
+                    })
+                    .then(response => {
+                        return response.text();
+                    })
+                    .then(html => {
+                        employeeInfo.innerHTML = html // Update the content of the div with detected employee info
+                    })
+                    .catch(error => {
+                        console.error("Error fetching employee info:", error);
+                    });
+                });
+            }
+
+            // Call the refresh function initially
+            refreshEmployeeInfo();
+
+            // You can also add a button or set a timer to call this function periodically
+            // For example, refreshing every 10 seconds:
+            // setInterval(refreshEmployeeInfo, 10000);
+        };
+
+    </script>
 </head>
 
 <body>
@@ -24,20 +62,11 @@
         <div class="toggle-container">
             <div class="toggle">
                 <div class="rectangle">
-                    <span>{{ employee_info['name'] }}</span>
+                    <span id="employee_name">{{ employee_info['name'] }}</span>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        const container = document.getElementById('container');
-        const loginBtn = document.getElementById('login');
-
-        loginBtn.addEventListener('click', () => {
-            container.classList.remove("active");
-        });
-    </script>
 </body>
 
 </html>

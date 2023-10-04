@@ -32,7 +32,6 @@ class EncodeGenerator:
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-
     def load_images(self):
         imgList = []
         employesID = []
