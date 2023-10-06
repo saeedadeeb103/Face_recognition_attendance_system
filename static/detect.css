@@ -162,7 +162,7 @@ body{
     height: 40px;
 }
 
-.toggle-container{
+.toggle-container {
     position: absolute;
     top: 0;
     left: 60%;
@@ -172,42 +172,74 @@ body{
     transition: all 0.6s ease-in-out;
     border-radius: 150px 0 0 100px;
     z-index: 1000;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
 }
 
 .container.active .toggle-container{
     transform: translateX(-100%);
     border-radius: 0 150px 100px 0;
 }
+.employee-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    padding: 10px;
+    border-radius: 10px;
+    padding-left: -50px;
+    padding-top: -20px;
+}
 
-.toggle{
+.circle-image {
+    margin-bottom: 30px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.name {
+    margin: 5px 0;
+}
+
+.position, .employee-id, .time {
+    margin: 2px 0;
+}
+.toggle {
     background-color: #512da8;
     height: 100%;
     background: linear-gradient(to right, #5c6bc0, #512da8);
     color: #fff;
-    position: relative;
-    padding: 40%;
     height: 100%;
     width: 200%;
+    padding-right: 130px;
     transform: translateX(0);
     transition: transform 0.6s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
 }
-.rectangle{
+.fixing{
+    padding: 40%;
+}
+.rectangle {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
-    margin-left: -13%;
     width: 250px;
     height: 100px;
     background-color: white;
     border-radius: 50%;
-    display: flex;
     justify-content: center;
     align-items: center;
-  }
+    display: flex;
+}
   
-.rectangle span{
-    color: rgb(44, 1, 107); /* Change the color to a color that contrasts with the white background */
+.rectangle span {
+    color: rgb(44, 1, 107);
     font-size: 25px;
     font-weight: bold;
-
+    text-align: center;
 }
 
 .container.active .toggle{
