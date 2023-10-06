@@ -1,9 +1,15 @@
-{% if employee != []%}
-    {{ employee_info['name'] }}
-
+{% if employee_info.get('name') is not none %}
+    <div class="employee-info">
+        <img src="{{ url_for('static', filename='images/387.jpg') }}" alt="Employee Image" class="circle-image">
+        <h3 class="name">Name: {{ employee_info['name'] }}</h3>
+        <p class="position">Position: {{ employee_info['position'] }}</p>
+        <p class="employee-id">Employee ID: 12345</p>
+        <p class="time">Time: 9:00 AM</p>
+    </div>
+{% else %}
+    <div class="rectangle">
+        <span>
+            Active
+        </span>
+    </div>
 {% endif %}
-{% if employee == []%}
-    {{ employee_info['name'] }}
-
-{% endif %}
-

@@ -12,7 +12,7 @@ class FaceRecognitionAttendanceSystem:
     def __init__(self):
         self.data_manager = DataManager()
         self.imgsz = (640, 480)
-        self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+        self.cap = cv.VideoCapture(1, cv.CAP_DSHOW)
         self.cap.set(3, self.imgsz[0])
         self.cap.set(4, self.imgsz[1])
         self.counter = 0 

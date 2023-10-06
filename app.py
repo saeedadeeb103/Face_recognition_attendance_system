@@ -1,21 +1,21 @@
-from flask import Flask, render_template, Response, redirect, url_for
+from flask import Flask, render_template, Response, redirect, url_for, send_from_directory
 import cv2
 import face_recognition
 from main import FaceRecognitionAttendanceSystem
 from DataManager import DataManager
 from datetime import datetime
 import cvzone
-
+import time
 app = Flask(__name__, template_folder='./templates')
 
 imgsz = (640, 480)
-camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 attendance_system = FaceRecognitionAttendanceSystem()
 date = datetime.now().strftime("%Y-%m-%d")
 employee_info = {}
 
 def gen_frames():
-    global date, employee_info
+    global date, employee_info, recognized_face_detected
     recognized_face_detected = False
     while True:
         success, frame = camera.read()
@@ -77,6 +77,7 @@ def video_feed():
 
 if __name__ == '__main__':
     app.run()
+
 
 @app.after_request
 def release_camera(response):
