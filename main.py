@@ -71,11 +71,11 @@ class FaceRecognitionAttendanceSystem:
                     # Get The Image from the Storage 
                     employee_img = self.data_manager.get_employee_image_by_id(self.ID)
 
-                if 10 < self.counter < 20: 
+                if 15 < self.counter < 25: 
                     self.modeType = 2
 
                 self.imgBackground[44:44 + 633, 808:808 + 414] = self.imgModeList[self.modeType]
-                if self.counter <= 10:
+                if self.counter <= 20:
                     #import pdb 
                     #pdb.set_trace()
                     date = datetime.now()
