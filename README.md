@@ -23,14 +23,12 @@ Provide instructions on how to install and run the project on a local machine. F
 ```bash
 git clone https://github.com/your-github-username/face-recognition-attendance.git
 cd face-recognition-attendance
-# Installation steps
 ```
 
 ## Usage
 Briefly describe how to use the system. For example:
 ```bash
 python app.py
-# Instructions to navigate the web interface
 ```
 
 ## Contributing
